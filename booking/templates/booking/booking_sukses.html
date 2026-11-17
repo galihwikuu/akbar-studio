@@ -1,0 +1,31 @@
+{% extends "booking/base.html" %}
+{% block title %}Booking berhasil{% endblock %}
+{% block content %}
+<section class="sukses">
+  <h1>BOOKING BERHASIL</h1>
+  <div class="ringkasan">
+    <p>Nama: {{ booking.nama }}</p>
+    <p>Tanggal: {{ booking.tanggal|date:"d F Y" }}</p>
+    <p>Jam: {{ rentang }}</p>
+    <p>Total: Rp{{ total }} (bayar di tempat)</p>
+  </div>
+
+  <p class="notice" style="background:#fff3f3;border-left:4px solid #d1121b;padding:10px 14px;margin:12px 0;color:#8f0b11;font-weight:600;">PENTING: Silakan datang tepat waktu sesuai jam booking yang telah dipilih.</p>
+
+  <label for="token">Token pembatalan</label>
+  <div class="token">
+    <input type="text" id="token" value="{{ token }}" readonly>
+    <button type="button" class="btn" id="salin">Salin</button>
+  </div>
+  <p class="ket">Simpan token ini dan jangan dibagikan ke orang lain. Token dipakai untuk membatalkan booking.</p>
+
+  <a class="btn btn-full" href="{{ link_wa }}" target="_blank" rel="noopener">Konfirmasi via WhatsApp</a>
+  <p class="ket"><a href="{% url 'batal_booking' %}">Perlu membatalkan? Buka halaman pembatalan.</a></p>
+</section>
+<script>
+  document.getElementById("salin").addEventListener("click", function () {
+    navigator.clipboard.writeText(document.getElementById("token").value);
+    this.textContent = "Tersalin";
+  });
+</script>
+{% endblock %}

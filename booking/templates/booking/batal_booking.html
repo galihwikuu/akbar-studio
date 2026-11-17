@@ -1,0 +1,44 @@
+{% extends "booking/base.html" %}
+{% block title %}Batalkan booking{% endblock %}
+{% block content %}
+<section class="sukses">
+  <h1>BATALKAN BOOKING</h1>
+
+    {% if not dibatalkan %}
+    <p class="notice">Booking hanya bisa dibatalkan paling lambat 1 jam sebelum jam booking dimulai.</p> 
+    {% endif %}
+
+  {% if dibatalkan %}
+  <div class="ringkasan">
+    <p>Booking {{ booking.tanggal|date:"d F Y" }}, {{ rentang }} berhasil dibatalkan.</p>
+  </div>
+  <a class="btn btn-full" href="{{ link_wa }}" target="_blank" rel="noopener">Konfirmasi pembatalan via WhatsApp</a>
+
+  {% elif booking %}
+  <div class="ringkasan">
+    <p>Nama: {{ booking.nama }}</p>
+    <p>Tanggal: {{ booking.tanggal|date:"d F Y" }}</p>
+    <p>Jam: {{ rentang }}</p>
+    <p>Total: Rp{{ total }}</p>
+    <p>Bisa dibatalkan sampai: {{ batas|date:"d F Y, H.i" }}</p>
+  </div>
+  <form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="token" value="{{ token }}">
+    <input type="hidden" name="konfirmasi" value="1">
+    <button type="submit" class="btn btn-full">Ya, batalkan booking</button>
+  </form>
+
+  {% else %}
+  {% if error %}<div class="error">{{ error }}</div>{% endif %}
+  <form method="post">
+    {% csrf_token %}
+    <label for="id_token">Token booking</label>
+    <input type="text" name="token" id="id_token" maxlength="8" autocomplete="off" required>
+    <button type="submit" class="btn btn-full">Cek booking</button>
+  </form>
+  {% endif %}
+
+  <a class="btn" href="{% url 'buat_booking' %}" style="margin-top:12px; display:inline-block; text-align:center;">Kembali ke Beranda</a>
+</section>
+{% endblock %}

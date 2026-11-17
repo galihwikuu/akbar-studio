@@ -1,0 +1,216 @@
+{% extends "booking/base.html" %}
+{% block title %}Booking Studio Musik{% endblock %}
+{% block content %}
+<section class="hero reveal stagger-1"{% if hero_url %} style="--hero-img: url('{{ hero_url }}')"{% endif %}>
+  <h1>AKBAR<br>MUSIK<br>STUDIO </h1>
+  <a class="btn" href="#booking">Booking sekarang</a>
+</section>
+
+<section class="info reveal stagger-2">
+  <div><span>Harga per jam</span><strong>Rp{{ harga_teks }}</strong></div>
+  <div><span>Jam sewa</span><strong>{{ jam_buka }}.00-{{ jam_tutup }}.00</strong></div>
+</section>
+
+{% if tentang %}
+<section class="tentang reveal stagger-3">
+<h2>TENTANG STUDIO</h2>
+{{ tentang|linebreaks }}
+</section>
+{% endif %}
+
+<section class="booking reveal stagger-4" id="booking">
+  <h2>PILIH SLOT</h2>
+  <form method="post">
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="error">{{ form.non_field_errors }}</div>{% endif %}
+
+    <label for="id_tanggal">Tanggal</label>
+    <input type="date" name="tanggal" id="id_tanggal" min="{{ hari_ini|date:'Y-m-d' }}" value="{{ tanggal_awal }}" required>
+    {{ form.tanggal.errors }}
+
+    <label>Durasi</label>
+    <div class="kotak">
+      {% for d in daftar_durasi %}
+      <label class="pilih">
+        <input type="radio" name="durasi" value="{{ d }}" {% if form.durasi.value|stringformat:"s" == d|stringformat:"s" %}checked{% elif forloop.first and not form.is_bound %}checked{% endif %}>
+        <span>{{ d }} JAM</span>
+      </label>
+      {% endfor %}
+    </div>
+    {{ form.durasi.errors }}
+
+    <label>Jam mulai</label>
+    <div class="kotak">
+      {% for j in daftar_jam %}
+      <label class="pilih">
+        <input type="radio" name="jam_mulai" value="{{ j }}" {% if form.jam_mulai.value|stringformat:"s" == j|stringformat:"s" %}checked{% endif %}>
+        <span>{{ j|stringformat:"02d" }}.00</span>
+      </label>
+      {% endfor %}
+    </div>
+    <p class="ket" id="ringkas">Pilih tanggal dan jam mulai.</p>
+    {{ form.jam_mulai.errors }}
+
+    <label for="id_nama">Nama</label>
+    <input type="text" name="nama" id="id_nama" maxlength="100" value="{{ form.nama.value|default_if_none:'' }}" required>
+    {{ form.nama.errors }}
+
+    <label for="id_whatsapp">Nomor WhatsApp</label>
+    <input type="tel" name="whatsapp" id="id_whatsapp" maxlength="20" value="{{ form.whatsapp.value|default_if_none:'' }}" required>
+    {{ form.whatsapp.errors }}
+
+    <button type="submit" class="btn btn-full">Konfirmasi booking</button>
+  </form>
+</section>
+
+{% if alamat %}
+<section class="lokasi reveal stagger-5">
+  <h2>LOKASI KAMI</h2>
+  <p class="alamat">{{ alamat }}</p>
+  <iframe class="peta" src="{{ embed_maps }}" title="Peta lokasi studio" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+  <a class="btn btn-full" href="{{ link_maps }}" target="_blank" rel="noopener">Buka di Google Maps</a>
+</section>
+{% endif %}
+
+<section class="rating reveal stagger-1" id="rating">
+  <h2>RATING</h2>
+
+  {% if messages %}
+  <ul class="pesan">
+    {% for m in messages %}<li class="{{ m.tags }}">{{ m }}</li>{% endfor %}
+  </ul>
+  {% endif %}
+
+  {% if rating_jumlah %}
+  <p class="skor">
+    <span class="bintang">{% for i in bintang %}<span class="{% if i <= rating_bulat %}on{% endif %}">★</span>{% endfor %}</span>
+    <strong>{{ rating_rata }}</strong> dari 5 ({{ rating_jumlah }} rating)
+  </p>
+  {% else %}
+  <p class="ket">Belum ada rating.</p>
+  {% endif %}
+
+  {% if ulasan %}
+  <ul class="ulasan">
+    {% for u in ulasan %}
+    <li>
+      <div class="ulasan-atas">
+        <strong>{{ u.nama }}</strong>
+        <span class="bintang">{% for i in bintang %}<span class="{% if i <= u.nilai %}on{% endif %}">★</span>{% endfor %}</span>
+      </div>
+      <p>{{ u.pesan }}</p>
+      <small>{{ u.created_at|date:"d M Y" }}</small>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  {% if rating_saya %}
+  <p class="ket">Terima kasih, kamu sudah memberi rating {{ rating_saya }} ★.</p>
+  {% else %}
+  <form method="post" action="{% url 'beri_rating' %}">
+    {% csrf_token %}
+    <label for="rating_nama">Nama</label>
+    <input type="text" name="nama" id="rating_nama" maxlength="60" required>
+
+    <label>Rating kamu</label>
+    <div class="kotak">
+      {% for i in bintang %}
+      <label class="pilih">
+        <input type="radio" name="nilai" value="{{ i }}" required>
+        <span>{{ i }} ★</span>
+      </label>
+      {% endfor %}
+    </div>
+
+    <label for="rating_pesan">Pesan (opsional)</label>
+    <textarea name="pesan" id="rating_pesan" maxlength="300" rows="3"></textarea>
+
+    <button type="submit" class="btn btn-full">Kirim rating</button>
+  </form>
+  {% endif %}
+</section>
+
+<section class="galeri reveal stagger-3">
+  <h2>GALERI FOTO</h2>
+  <div class="daftar-foto">
+    {% for foto in daftar_foto %}
+    <figure class="item-foto">
+      <img src="{{ foto.foto.url }}" alt="{{ foto.judul|default:'Foto Studio' }}">
+      {% if foto.judul %}
+      <figcaption>{{ foto.judul }}</figcaption>
+      {% endif %}
+    </figure>
+    {% empty %}
+    <p class="ket">Belum ada foto galeri.</p>
+    {% endfor %}
+  </div>
+  <a class="btn btn-full" href="{% url 'galeri' %}">Lihat Semua Galeri</a>
+</section>
+
+<section class="kontak reveal stagger-2">
+  <h2>HUBUNGI KAMI</h2>
+  <a class="btn" href="{{ kontak_wa }}" target="_blank" rel="noopener">Chat WhatsApp admin</a>
+</section>
+
+<script>
+  const JAM_TUTUP = {{ jam_tutup }};
+  const HARGA = {{ harga }};
+  const URL_SLOT = "{% url 'slot_terisi' %}";
+  const tanggal = document.getElementById("id_tanggal");
+  const ringkas = document.getElementById("ringkas");
+  const jamRadios = document.querySelectorAll('input[name="jam_mulai"]');
+  let terisi = [];
+
+  function pad(n) {
+    return String(n).padStart(2, "0");
+  }
+
+  function durasiDipilih() {
+    const r = document.querySelector('input[name="durasi"]:checked');
+    return r ? parseInt(r.value, 10) : 1;
+  }
+
+  function perbarui() {
+    const durasi = durasiDipilih();
+    const hariIni = new Date().toLocaleDateString("sv-SE");
+    const jamSekarang = new Date().getHours();
+    jamRadios.forEach(function (radio) {
+      const mulai = parseInt(radio.value, 10);
+      let bisa = mulai + durasi <= JAM_TUTUP;
+      for (let j = mulai; j < mulai + durasi; j++) {
+        if (terisi.includes(j)) bisa = false;
+      }
+      if (tanggal.value === hariIni && mulai <= jamSekarang) bisa = false;
+      radio.disabled = !bisa;
+      if (!bisa) radio.checked = false;
+    });
+    const dipilih = document.querySelector('input[name="jam_mulai"]:checked');
+    if (dipilih) {
+      const m = parseInt(dipilih.value, 10);
+      ringkas.textContent = pad(m) + ".00 - " + pad(m + durasi) + ".00, total Rp" + (durasi * HARGA).toLocaleString("id-ID");
+    } else {
+      ringkas.textContent = "Pilih jam mulai yang tersedia.";
+    }
+  }
+
+  function muatTerisi() {
+    if (!tanggal.value) {
+      terisi = [];
+      perbarui();
+      return;
+    }
+    fetch(URL_SLOT + "?tanggal=" + tanggal.value)
+      .then(function (r) { return r.json(); })
+      .then(function (data) { terisi = data.terisi; perbarui(); })
+      .catch(function () { terisi = []; perbarui(); });
+  }
+
+  tanggal.addEventListener("change", muatTerisi);
+  document.querySelectorAll('input[name="durasi"], input[name="jam_mulai"]').forEach(function (el) {
+    el.addEventListener("change", perbarui);
+  });
+  muatTerisi();
+  setInterval(muatTerisi, 60000); 
+</script>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "booking/base.html" %}
+{% block title %}Galeri Foto | Studio Musik{% endblock %}
+{% block content %}
+<section class="sukses">
+  <h1>GALERI FOTO</h1>
+  <p class="ket">Kumpulan foto studio dan fasilitas latihan musik kami.</p>
+
+  <div class="daftar-foto-full">
+    {% for foto in daftar_foto %}
+    <figure class="item-foto-full">
+      <img src="{{ foto.foto.url }}" alt="{{ foto.judul|default:'Foto Studio' }}">
+      {% if foto.judul %}
+      <figcaption>{{ foto.judul }}</figcaption>
+      {% endif %}
+    </figure>
+    {% empty %}
+    <p class="ket">Belum ada foto galeri.</p>
+    {% endfor %}
+  </div>
+
+  <a class="btn btn-full" href="{% url 'buat_booking' %}">Kembali ke Beranda</a>
+</section>
+{% endblock %}

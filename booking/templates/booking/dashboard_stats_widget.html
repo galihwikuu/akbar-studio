@@ -1,0 +1,288 @@
+{% load static %}
+<style>
+  .admin-dashboard-wrapper {
+    margin-top: 20px;
+    border-top: 1px solid #c5c6c7;
+    padding-top: 20px;
+  }
+
+  .admin-dashboard-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .admin-dashboard-header h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #212529;
+    border-bottom: 3px solid #d1121b;
+    padding-bottom: 8px;
+    display: inline-block;
+  }
+
+  .admin-dashboard-header p {
+    margin: 0;
+    font-size: 13px;
+    color: #6c757d;
+  }
+
+  .admin-dashboard-filter {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    font-size: 13px;
+    color: #495057;
+  }
+
+  .admin-dashboard-filter label {
+    margin: 0;
+    font-weight: 500;
+  }
+
+  .admin-dashboard-filter input[type="date"] {
+    padding: 4px 8px;
+    border: 1px solid #ced4da;
+    border-radius: 3px;
+    font-size: 13px;
+    font-family: inherit;
+  }
+
+  .admin-dashboard-filter button {
+    padding: 4px 12px;
+    background: #d1121b;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .admin-dashboard-filter button:hover {
+    background: #8f0b11;
+  }
+
+  .admin-dashboard-filter a {
+    color: #007bff;
+    text-decoration: none;
+    font-size: 13px;
+  }
+
+  .admin-dashboard-filter a:hover {
+    text-decoration: underline;
+  }
+
+  .admin-stat-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .admin-stat-card {
+    flex: 0 0 auto;
+    width: 200px;
+    max-width: 240px;
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-left: 5px solid #d1121b;
+    border-radius: 4px;
+    padding: 14px 16px;
+    box-sizing: border-box;
+  }
+
+  .admin-stat-card h3 {
+    margin: 0 0 6px;
+    font-size: 12px;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .admin-stat-value {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+    color: #212529;
+  }
+
+  .admin-stat-value.admin-stat-total {
+    color: #d1121b;
+  }
+
+  .admin-dashboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    overflow: hidden;
+    font-size: 13px;
+  }
+
+  .admin-dashboard-table th {
+    background: #f8f9fa;
+    color: #495057;
+    font-weight: 600;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid #dee2e6;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  .admin-dashboard-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid #dee2e6;
+    color: #212529;
+  }
+
+  .admin-dashboard-table tr:nth-child(even) td {
+    background: #f8f9fa;
+  }
+
+  .admin-dashboard-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .admin-dashboard-table tr:hover td {
+    background: #f1f3f5;
+  }
+
+  .admin-dashboard-table code {
+    background: #e9ecef;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 12px;
+    color: #495057;
+  }
+
+  .admin-empty-row td {
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+    padding: 20px;
+  }
+
+  @media (max-width: 768px) {
+    .admin-dashboard-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .admin-dashboard-filter {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .admin-stat-row {
+      flex-direction: column;
+    }
+
+    .admin-stat-card {
+      width: 100%;
+      max-width: 100%;
+    }
+  }
+</style>
+
+<div class="admin-dashboard-wrapper">
+  <div class="admin-dashboard-header">
+    <div>
+      <h2>Dashboard Pendapatan</h2>
+      <p>Data dihitung setelah jam booking selesai (berdasarkan waktu selesai setiap slot).</p>
+    </div>
+
+    <div class="admin-dashboard-filter">
+      <form method="get" style="margin:0; display:flex; gap:8px; align-items:center;">
+        <label for="filter_tanggal">Tanggal:</label>
+        <input type="date" id="filter_tanggal" name="tanggal" value="{{ selected_date_str }}">
+        <button type="submit">Tampilkan</button>
+        {% if selected_date %}
+          <a href="?">Reset</a>
+        {% endif %}
+      </form>
+    </div>
+  </div>
+
+  <div class="admin-stat-row">
+    <div class="admin-stat-card">
+      <h3>Total Pendapatan</h3>
+      <p class="admin-stat-value admin-stat-total">Rp{{ total_pendapatan|floatformat:0|default:0 }}</p>
+    </div>
+    <div class="admin-stat-card">
+      <h3>Jumlah Booking Selesai</h3>
+      <p class="admin-stat-value">{{ jumlah_booking }}</p>
+    </div>
+    <div class="admin-stat-card">
+      <h3>Rata-rata per Booking</h3>
+      <p class="admin-stat-value">Rp{{ rata_rata|floatformat:0|default:0 }}</p>
+    </div>
+  </div>
+
+  <table class="admin-dashboard-table">
+    <thead>
+      <tr>
+        <th>Nama</th>
+        <th>Tanggal</th>
+        <th>Jam</th>
+        <th>Durasi</th>
+        <th>Total</th>
+        <th>Token</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for b in finished_bookings %}
+      <tr>
+        <td>{{ b.nama }}</td>
+        <td>{{ b.tanggal|date:"d M Y" }}</td>
+        <td>{{ b.jam_mulai|stringformat:"02d" }}.00 - {{ b.jam_selesai|stringformat:"02d" }}.00</td>
+        <td>{{ b.durasi }} jam</td>
+        <td>Rp{{ b.total|floatformat:0 }}</td>
+        <td><code>{{ b.token }}</code></td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td class="admin-empty-row" colspan="6">Belum ada booking yang selesai pada tanggal ini.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="admin-dashboard-table-wrapper" style="margin-top:24px;">
+  <h3 style="margin:0 0 12px;padding:16px 14px;background:#f8f9fa;border-bottom:1px solid #dee2e6;font-size:16px;color:#212529;">Booking Terbaru (Masih Aktif)</h3>
+  <table class="admin-dashboard-table">
+    <thead>
+      <tr>
+        <th>Nama</th>
+        <th>Tanggal</th>
+        <th>Jam</th>
+        <th>Durasi</th>
+        <th>Token</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for b in active_bookings %}
+      <tr>
+        <td>{{ b.nama }}</td>
+        <td>{{ b.tanggal|date:"d M Y" }}</td>
+        <td>{{ b.jam_mulai|stringformat:"02d" }}.00 - {{ b.jam_selesai|stringformat:"02d" }}.00</td>
+        <td>{{ b.durasi }} jam</td>
+        <td><code>{{ b.token }}</code></td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td class="admin-empty-row" colspan="5">Belum ada booking yang masih aktif.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+</div>
