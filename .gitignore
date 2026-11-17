@@ -30,8 +30,11 @@ develop-eggs/
 # Django
 *.log
 staticfiles/
-static/
 media/
+
+# Source static files (track these for deployment)
+!static/
+!**/static/**
 .env
 .env.local
 .env.*.local
