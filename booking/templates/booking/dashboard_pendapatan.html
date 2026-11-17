@@ -49,7 +49,7 @@
         {% for b in finished_bookings %}
         <tr>
           <td>{{ b.nama }}</td>
-          <td>{{ b.tanggal|date:"d M Y" }}</td>
+          <td>{{ b.tanggal|date:"d m y" }}</td>
           <td>{{ b.jam_mulai|stringformat:"02d" }}.00 - {{ b.jam_selesai|stringformat:"02d" }}.00</td>
           <td>{{ b.durasi }} jam</td>
           <td>Rp{{ b.total|floatformat:0 }}</td>
@@ -78,7 +78,7 @@
         {% for b in active_bookings %}
         <tr>
           <td>{{ b.nama }}</td>
-          <td>{{ b.tanggal|date:"d M Y" }}</td>
+          <td>{{ b.tanggal|date:"d m y" }}</td>
           <td>{{ b.jam_mulai|stringformat:"02d" }}.00 - {{ b.jam_selesai|stringformat:"02d" }}.00</td>
           <td>{{ b.durasi }} jam</td>
           <td><code>{{ b.token }}</code></td>

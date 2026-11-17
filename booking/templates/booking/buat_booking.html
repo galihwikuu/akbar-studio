@@ -106,7 +106,7 @@
         <span class="bintang">{% for i in bintang %}<span class="{% if i <= u.nilai %}on{% endif %}">★</span>{% endfor %}</span>
       </div>
       <p>{{ u.pesan }}</p>
-      <small>{{ u.created_at|date:"d M Y" }}</small>
+      <small>{{ u.created_at|date:"d m y" }}</small>
     </li>
     {% endfor %}
   </ul>
