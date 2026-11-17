@@ -206,7 +206,6 @@
     const durasi = durasiDipilih();
     const hariIni = pad(new Date().getDate()) + "-" + pad(new Date().getMonth() + 1) + "-" + new Date().getFullYear();
     const jamSekarang = new Date().getHours();
-    let adaTersedia = false;
     jamRadios.forEach(function (radio) {
       const mulai = parseInt(radio.value, 10);
       let bisa = mulai + durasi <= JAM_TUTUP;
@@ -216,15 +215,7 @@
       if (tanggal.value === hariIni && mulai <= jamSekarang) bisa = false;
       radio.disabled = !bisa;
       if (!bisa) radio.checked = false;
-      if (bisa) adaTersedia = true;
     });
-    if (pesanSlot) {
-      if (!adaTersedia) {
-        pesanSlot.style.display = "block";
-      } else {
-        pesanSlot.style.display = "none";
-      }
-    }
     const dipilih = document.querySelector('input[name="jam_mulai"]:checked');
     if (dipilih) {
       const m = parseInt(dipilih.value, 10);
