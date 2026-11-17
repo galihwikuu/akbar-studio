@@ -42,26 +42,6 @@ h1, h2 {
   color: transparent;
 }
 h1 { font-size: clamp(48px, 14vw, 96px); line-height: 0.95; }
-
-.envelope-title {
-  margin: 0 0 12px;
-  font-weight: 400;
-  display: block;
-  width: 100%;
-  text-align: center;
-}
-.envelope-title svg {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-.envelope-title text {
-  fill: url(#envelope-grad);
-  font-family: "Bebas Neue", sans-serif;
-  font-size: clamp(48px, 14vw, 96px);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
 h2 { font-size: 32px; }
 
 .hero {
