@@ -32,7 +32,7 @@
     {% if form.non_field_errors %}<div class="error">{{ form.non_field_errors }}</div>{% endif %}
 
     <label for="id_tanggal">Tanggal</label>
-    <input type="text" name="tanggal" id="id_tanggal" value="{{ tanggal_awal }}" placeholder="dd-mm-yyyy" pattern="[0-9]{2}-[0-9]{2}-[0-9]{4}" required>
+    <input type="text" name="tanggal" id="id_tanggal" value="{{ tanggal_awal }}" placeholder="dd-mm-yyyy" readonly required>
     {{ form.tanggal.errors }}
 
     <label>Durasi</label>
@@ -165,7 +165,8 @@
   flatpickr("#id_tanggal", {
     dateFormat: "d-m-Y",
     minDate: "today",
-    allowInput: true,
+    allowInput: false,
+    clickOpens: true,
   });
   const JAM_TUTUP = {{ jam_tutup }};
   const HARGA = {{ harga }};
