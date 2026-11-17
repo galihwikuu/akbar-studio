@@ -32,7 +32,7 @@
     {% if form.non_field_errors %}<div class="error">{{ form.non_field_errors }}</div>{% endif %}
 
     <label for="id_tanggal">Tanggal</label>
-    <input type="text" name="tanggal" id="id_tanggal" value="{{ tanggal_awal }}" placeholder="dd-mm-yyyy" readonly required>
+    <input type="text" name="tanggal" id="id_tanggal" value="{{ tanggal_awal }}" placeholder="pilih tanggal" readonly required>
     {{ form.tanggal.errors }}
 
     <label>Durasi</label>
