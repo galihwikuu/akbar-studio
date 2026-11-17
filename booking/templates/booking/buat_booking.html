@@ -2,7 +2,14 @@
 {% block title %}Akbar Musik Studio{% endblock %}
 {% block content %}
 <section class="hero reveal stagger-1"{% if hero_url %} style="--hero-img: url('{{ hero_url }}')"{% endif %}>
-  <h1>AKBAR<br>MUSIK<br>STUDIO </h1>
+<h1>
+  <span class="sr-only">Akbar Musik Studio</span>
+  <span aria-hidden="true">
+    <span class="arc arc-up">AKBAR</span><br>
+    <span>MUSIK</span><br>
+    <span class="arc arc-down">STUDIO</span>
+  </span>
+</h1>
   <a class="btn" href="#booking">Booking sekarang</a>
 </section>
 
@@ -212,5 +219,23 @@
   });
   muatTerisi();
   setInterval(muatTerisi, 60000); 
+
+
+document.querySelectorAll('.arc').forEach(el => {
+  const chars = [...el.textContent];
+  const mid = (chars.length - 1) / 2;
+  el.textContent = '';
+  el.setAttribute('aria-hidden', 'true');
+  chars.forEach((c, i) => {
+    const s = document.createElement('span');
+    s.textContent = c;
+    s.style.setProperty('--d', i - mid);
+    el.appendChild(s);
+  });
+});
+
+
 </script>
+
+
 {% endblock %}

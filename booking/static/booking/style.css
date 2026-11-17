@@ -369,3 +369,28 @@ textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 10p
 .item-foto img:hover, .item-foto-full img:hover {
   transform: scale(1.05);
 }
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.arc span {
+  display: inline-block;
+  background: linear-gradient(180deg, #ffffff 0%, var(--metal) 45%, #6b6e75 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  padding: 0 0.06em;
+  margin: 0 -0.06em;
+  transform:
+    translateY(calc(var(--d) * var(--d) * var(--lift)))
+    rotate(calc(var(--d) * var(--tilt)));
+}
+
+.arc-up   { --lift: 6px;  --tilt: 4deg; }   /* AKBAR: melengkung ke atas */
+.arc-down { --lift: -6px; --tilt: -4deg; }  /* STUDIO: melengkung ke bawah */
