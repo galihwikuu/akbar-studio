@@ -244,8 +244,12 @@
       .then(function (r) { return r.json(); })
       .then(function (data) {
         terisi = data.terisi;
-        if (data.semua_terisi && pesanSlot) {
-          pesanSlot.style.display = "block";
+        if (pesanSlot) {
+          if (data.semua_terisi) {
+            pesanSlot.style.display = "block";
+          } else {
+            pesanSlot.style.display = "none";
+          }
         }
         perbarui();
       })

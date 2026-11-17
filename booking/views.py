@@ -81,7 +81,7 @@ def buat_booking(request):
         "studio_tutup": studio_tutup,
         "slot_penuh": slot_penuh,
         "pesan_studio_tutup": "Studio sudah tutup untuk hari ini. Kami buka kembali besok pagi.",
-        "pesan_slot_penuh": "Maaf, semua slot untuk tanggal ini sudah penuh. Silakan pilih tanggal lain.",
+        "pesan_slot_penuh": "Maaf, semua slot untuk hari ini sudah penuh. Silakan pilih tanggal lain.",
     }
     return render(request, "booking/buat_booking.html", konteks)
 
