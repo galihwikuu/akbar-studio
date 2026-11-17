@@ -2,7 +2,21 @@
 {% block title %}Akbar Musik Studio{% endblock %}
 {% block content %}
 <section class="hero reveal stagger-1"{% if hero_url %} style="--hero-img: url('{{ hero_url }}')"{% endif %}>
-  <h1>AKBAR<br>MUSIK<br>STUDIO </h1>
+  <h1 class="envelope-title">
+    <svg viewBox="0 0 1000 220" preserveAspectRatio="xMidYMid meet" aria-label="AKBAR MUSIK STUDIO" role="img">
+      <defs>
+        <linearGradient id="envelope-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="45%" stop-color="#c9ccd1"/>
+          <stop offset="100%" stop-color="#6b6e75"/>
+        </linearGradient>
+      </defs>
+      <path id="envelope-path" d="M 40,190 Q 500,30 960,190" fill="none"/>
+      <text textLength="920" lengthAdjust="spacingAndGlyphs">
+        <textPath href="#envelope-path" startOffset="50%" text-anchor="middle">AKBAR MUSIK STUDIO</textPath>
+      </text>
+    </svg>
+  </h1>
   <a class="btn" href="#booking">Booking sekarang</a>
 </section>
 
