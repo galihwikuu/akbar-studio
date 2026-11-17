@@ -269,7 +269,16 @@ document.querySelectorAll('.arc').forEach(el => {
 });
 
 
-</script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const hasErrors = document.querySelectorAll('.error, .errorlist').length > 0;
+    if (hasErrors) {
+      const bookingSection = document.getElementById('booking');
+      if (bookingSection) {
+        bookingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  });
+  </script>
 
 
 {% endblock %}
