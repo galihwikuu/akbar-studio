@@ -26,6 +26,8 @@ class BookingForm(forms.Form):
 
     def clean_whatsapp(self):
         nomor = "".join(c for c in self.cleaned_data["whatsapp"] if c.isdigit())
+        if not (nomor.startswith("08") or nomor.startswith("628")):
+            raise forms.ValidationError("Nomor WhatsApp harus diawali 08 atau 628.")
         if not 9 <= len(nomor) <= 15:
             raise forms.ValidationError("Nomor WhatsApp tidak valid.")
         return nomor
