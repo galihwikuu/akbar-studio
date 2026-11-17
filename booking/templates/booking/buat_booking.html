@@ -160,7 +160,13 @@
   <a class="btn" href="{{ kontak_wa }}" target="_blank" rel="noopener">Chat WhatsApp admin</a>
 </section>
 
-<script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script>
+  flatpickr("#id_tanggal", {
+    dateFormat: "d-m-Y",
+    minDate: "today",
+    allowInput: true,
+  });
   const JAM_TUTUP = {{ jam_tutup }};
   const HARGA = {{ harga }};
   const URL_SLOT = "{% url 'slot_terisi' %}";
