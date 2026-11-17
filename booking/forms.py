@@ -33,7 +33,7 @@ class BookingForm(forms.Form):
     def clean_tanggal(self):
         tanggal = self.cleaned_data["tanggal"]
         if tanggal < timezone.localdate():
-            raise forms.ValidationError("Tanggal sudah lewat.")
+            raise forms.ValidationError("Tanggal yang dipilih sudah lewat.")
         return tanggal
 
     def clean(self):
@@ -46,17 +46,17 @@ class BookingForm(forms.Form):
 
         jam_dipesan = list(range(mulai, mulai + durasi))
         if jam_dipesan[-1] >= settings.JAM_TUTUP:
-            raise forms.ValidationError("Durasi melewati jam tutup.")
+            raise forms.ValidationError("Durasi booking melebihi jam tutup studio.")
 
         if tanggal == timezone.localdate() and timezone.localtime().hour >= mulai:
-            raise forms.ValidationError("Jam mulai sudah lewat.")
+            raise forms.ValidationError("Waktu booking untuk jam ini sudah lewat.")
 
         terisi = Booking.objects.filter(
             tanggal=tanggal, status="confirmed", jam_mulai__in=jam_dipesan
         ).values_list("jam_mulai", flat=True)
         if terisi:
             daftar = ", ".join(f"{j:02d}.00" for j in sorted(terisi))
-            raise forms.ValidationError(f"Jam {daftar} sudah terisi.")
+            raise forms.ValidationError(f"Maaf, jam {daftar} sudah dipilih orang lain.")
         return data
 
 class RatingForm(forms.ModelForm):

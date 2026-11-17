@@ -36,6 +36,25 @@ def buat_booking(request):
     rata = ringkasan["rata"] or 0
     pengaturan = PengaturanSitus.objects.first()
 
+    now = timezone.localtime()
+    jam_sekarang = now.hour
+    studio_tutup = jam_sekarang >= settings.JAM_TUTUP
+    slot_penuh = False
+
+    if not studio_tutup:
+        tanggal_pilih = now.date()
+        jam_tersedia = []
+        for j in range(settings.JAM_BUKA, settings.JAM_TUTUP):
+            if jam_sekarang >= j:
+                continue
+            jam_tersedia.append(j)
+        terisi_hari_ini = Booking.objects.filter(
+            tanggal=tanggal_pilih, status="confirmed"
+        ).values_list("jam_mulai", flat=True)
+        tersedia = [j for j in jam_tersedia if j not in terisi_hari_ini]
+        if not tersedia:
+            slot_penuh = True
+
     konteks = {
         "form": form,
         "tanggal_awal": tanggal_awal,
@@ -59,6 +78,10 @@ def buat_booking(request):
         "harga_teks": f"{settings.HARGA_PER_JAM:,}".replace(",", "."),
         "hari_ini": timezone.localdate().strftime("%d-%m-%Y"),
         "kontak_wa": f"https://wa.me/{settings.WHATSAPP_ADMIN}",
+        "studio_tutup": studio_tutup,
+        "slot_penuh": slot_penuh,
+        "pesan_studio_tutup": "Studio sudah tutup untuk hari ini. Kami buka kembali besok pagi.",
+        "pesan_slot_penuh": "Maaf, semua slot untuk tanggal ini sudah penuh. Silakan pilih tanggal lain.",
     }
     return render(request, "booking/buat_booking.html", konteks)
 
@@ -137,9 +160,12 @@ def slot_terisi(request):
     try:
         tanggal = datetime.strptime(request.GET.get("tanggal", ""), "%d-%m-%Y").date()
     except ValueError:
-        return JsonResponse({"terisi": []})
+        return JsonResponse({"terisi": [], "semua_terisi": False})
     terisi = Booking.objects.filter(tanggal=tanggal, status="confirmed").values_list("jam_mulai", flat=True)
-    return JsonResponse({"terisi": list(terisi)})
+    terisi_list = list(terisi)
+    jam_semua = list(range(settings.JAM_BUKA, settings.JAM_TUTUP))
+    semua_terisi = all(j in terisi_list for j in jam_semua)
+    return JsonResponse({"terisi": terisi_list, "semua_terisi": semua_terisi})
 
 @require_POST
 def beri_rating(request):

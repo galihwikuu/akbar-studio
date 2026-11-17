@@ -27,6 +27,21 @@
 
 <section class="booking reveal stagger-4" id="booking">
   <h2>PILIH SLOT</h2>
+
+  {% if studio_tutup %}
+  <div class="notice" style="background:#fff3f3;border-left:4px solid #d1121b;padding:12px 16px;margin-bottom:16px;color:#8f0b11;font-weight:600;text-align:center;">
+    {{ pesan_studio_tutup }}
+  </div>
+  {% elif slot_penuh %}
+  <div class="notice" style="background:#fff3f3;border-left:4px solid #d1121b;padding:12px 16px;margin-bottom:16px;color:#8f0b11;font-weight:600;text-align:center;">
+    {{ pesan_slot_penuh }}
+  </div>
+  {% else %}
+  <div id="pesan-slot" style="display:none; background:#fff3f3;border-left:4px solid #d1121b;padding:12px 16px;margin-bottom:16px;color:#8f0b11;font-weight:600;text-align:center;">
+    {{ pesan_slot_penuh }}
+  </div>
+  {% endif %}
+
   <form method="post">
     {% csrf_token %}
     {% if form.non_field_errors %}<div class="error">{{ form.non_field_errors }}</div>{% endif %}
@@ -185,10 +200,13 @@
     return r ? parseInt(r.value, 10) : 1;
   }
 
+  const pesanSlot = document.getElementById("pesan-slot");
+
   function perbarui() {
     const durasi = durasiDipilih();
     const hariIni = pad(new Date().getDate()) + "-" + pad(new Date().getMonth() + 1) + "-" + new Date().getFullYear();
     const jamSekarang = new Date().getHours();
+    let adaTersedia = false;
     jamRadios.forEach(function (radio) {
       const mulai = parseInt(radio.value, 10);
       let bisa = mulai + durasi <= JAM_TUTUP;
@@ -198,7 +216,15 @@
       if (tanggal.value === hariIni && mulai <= jamSekarang) bisa = false;
       radio.disabled = !bisa;
       if (!bisa) radio.checked = false;
+      if (bisa) adaTersedia = true;
     });
+    if (pesanSlot) {
+      if (!adaTersedia) {
+        pesanSlot.style.display = "block";
+      } else {
+        pesanSlot.style.display = "none";
+      }
+    }
     const dipilih = document.querySelector('input[name="jam_mulai"]:checked');
     if (dipilih) {
       const m = parseInt(dipilih.value, 10);
@@ -216,7 +242,13 @@
     }
     fetch(URL_SLOT + "?tanggal=" + tanggal.value)
       .then(function (r) { return r.json(); })
-      .then(function (data) { terisi = data.terisi; perbarui(); })
+      .then(function (data) {
+        terisi = data.terisi;
+        if (data.semua_terisi && pesanSlot) {
+          pesanSlot.style.display = "block";
+        }
+        perbarui();
+      })
       .catch(function () { terisi = []; perbarui(); });
   }
 
