@@ -17,7 +17,10 @@ def pilihan_jam_mulai():
 class BookingForm(forms.Form):
     nama = forms.CharField(max_length=100)
     whatsapp = forms.CharField(max_length=20)
-    tanggal = forms.DateField(widget=forms.DateInput(attrs={"type": "date"}))
+    tanggal = forms.DateField(
+        widget=forms.DateInput(attrs={"type": "text", "placeholder": "dd-mm-yyyy", "pattern": "[0-9]{2}-[0-9]{2}-[0-9]{4}"}),
+        input_formats=["%d-%m-%Y"],
+    )
     durasi = forms.TypedChoiceField(choices=pilihan_durasi, coerce=int)
     jam_mulai = forms.TypedChoiceField(choices=pilihan_jam_mulai, coerce=int)
 

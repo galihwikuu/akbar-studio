@@ -44,7 +44,7 @@
     font-weight: 500;
   }
 
-  .admin-dashboard-filter input[type="date"] {
+  .admin-dashboard-filter input[type="text"] {
     padding: 4px 8px;
     border: 1px solid #ced4da;
     border-radius: 3px;
@@ -202,7 +202,7 @@
     <div class="admin-dashboard-filter">
       <form method="get" style="margin:0; display:flex; gap:8px; align-items:center;">
         <label for="filter_tanggal">Tanggal:</label>
-        <input type="date" id="filter_tanggal" name="tanggal" value="{{ selected_date_str }}">
+        <input type="text" id="filter_tanggal" name="tanggal" value="{{ selected_date_str }}" placeholder="dd-mm-yyyy" pattern="[0-9]{2}-[0-9]{2}-[0-9]{4}">
         <button type="submit">Tampilkan</button>
         {% if selected_date %}
           <a href="?">Reset</a>
@@ -241,7 +241,7 @@
       {% for b in finished_bookings %}
       <tr>
         <td>{{ b.nama }}</td>
-        <td>{{ b.tanggal|date:"d m y" }}</td>
+        <td>{{ b.tanggal|date:"d-m-Y" }}</td>
         <td>{{ b.jam_mulai|stringformat:"02d" }}.00 - {{ b.jam_selesai|stringformat:"02d" }}.00</td>
         <td>{{ b.durasi }} jam</td>
         <td>Rp{{ b.total|floatformat:0 }}</td>
@@ -272,7 +272,7 @@
       {% for b in active_bookings %}
       <tr>
         <td>{{ b.nama }}</td>
-        <td>{{ b.tanggal|date:"d m y" }}</td>
+        <td>{{ b.tanggal|date:"d-m-Y" }}</td>
         <td>{{ b.jam_mulai|stringformat:"02d" }}.00 - {{ b.jam_selesai|stringformat:"02d" }}.00</td>
         <td>{{ b.durasi }} jam</td>
         <td><code>{{ b.token }}</code></td>

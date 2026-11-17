@@ -19,7 +19,7 @@ def dashboard_stats(context):
         selected_date_str = request.GET.get("tanggal")
         if selected_date_str:
             try:
-                selected_date = date.fromisoformat(selected_date_str)
+                selected_date = datetime.strptime(selected_date_str, "%d-%m-%Y").date()
             except ValueError:
                 selected_date = timezone.localdate()
         else:
@@ -87,7 +87,7 @@ def dashboard_stats(context):
     return {
         "request": request,
         "selected_date": selected_date,
-        "selected_date_str": selected_date.isoformat() if selected_date else "",
+        "selected_date_str": selected_date.strftime("%d-%m-%Y") if selected_date else "",
         "total_pendapatan": total_pendapatan,
         "jumlah_booking": jumlah_booking,
         "rata_rata": rata_rata,

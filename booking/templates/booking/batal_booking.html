@@ -10,17 +10,17 @@
 
   {% if dibatalkan %}
   <div class="ringkasan">
-    <p>Booking {{ booking.tanggal|date:"d m y" }}, {{ rentang }} berhasil dibatalkan.</p>
+    <p>Booking {{ booking.tanggal|date:"d-m-Y" }}, {{ rentang }} berhasil dibatalkan.</p>
   </div>
   <a class="btn btn-full" href="{{ link_wa }}" target="_blank" rel="noopener">Konfirmasi pembatalan via WhatsApp</a>
 
   {% elif booking %}
   <div class="ringkasan">
     <p>Nama: {{ booking.nama }}</p>
-    <p>Tanggal: {{ booking.tanggal|date:"d m y" }}</p>
+    <p>Tanggal: {{ booking.tanggal|date:"d-m-Y" }}</p>
     <p>Jam: {{ rentang }}</p>
     <p>Total: Rp{{ total }}</p>
-    <p>Bisa dibatalkan sampai: {{ batas|date:"d m y, H.i" }}</p>
+    <p>Bisa dibatalkan sampai: {{ batas|date:"d-m-Y, H.i" }}</p>
   </div>
   <form method="post">
     {% csrf_token %}

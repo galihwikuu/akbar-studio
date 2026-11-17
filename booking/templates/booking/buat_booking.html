@@ -32,7 +32,7 @@
     {% if form.non_field_errors %}<div class="error">{{ form.non_field_errors }}</div>{% endif %}
 
     <label for="id_tanggal">Tanggal</label>
-    <input type="date" name="tanggal" id="id_tanggal" min="{{ hari_ini|date:'Y-m-d' }}" value="{{ tanggal_awal }}" required>
+    <input type="text" name="tanggal" id="id_tanggal" value="{{ tanggal_awal }}" placeholder="dd-mm-yyyy" pattern="[0-9]{2}-[0-9]{2}-[0-9]{4}" required>
     {{ form.tanggal.errors }}
 
     <label>Durasi</label>
@@ -106,7 +106,7 @@
         <span class="bintang">{% for i in bintang %}<span class="{% if i <= u.nilai %}on{% endif %}">★</span>{% endfor %}</span>
       </div>
       <p>{{ u.pesan }}</p>
-      <small>{{ u.created_at|date:"d m y" }}</small>
+      <small>{{ u.created_at|date:"d-m-Y" }}</small>
     </li>
     {% endfor %}
   </ul>
@@ -180,7 +180,7 @@
 
   function perbarui() {
     const durasi = durasiDipilih();
-    const hariIni = new Date().toLocaleDateString("sv-SE");
+    const hariIni = pad(new Date().getDate()) + "-" + pad(new Date().getMonth() + 1) + "-" + new Date().getFullYear();
     const jamSekarang = new Date().getHours();
     jamRadios.forEach(function (radio) {
       const mulai = parseInt(radio.value, 10);

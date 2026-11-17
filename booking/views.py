@@ -29,7 +29,7 @@ def buat_booking(request):
         }
         return redirect("konfirmasi_booking")
 
-    tanggal_awal = request.POST.get("tanggal") or timezone.localdate().isoformat()
+    tanggal_awal = request.POST.get("tanggal") or timezone.localdate().strftime("%d-%m-%Y")
     daftar_rating = Rating.objects.filter(tampil=True)
     daftar_foto = FotoGaleri.objects.filter(tampil=True)[:4]
     ringkasan = daftar_rating.aggregate(rata=Avg("nilai"), jumlah=Count("id"))
@@ -57,7 +57,7 @@ def buat_booking(request):
         "jam_tutup": settings.JAM_TUTUP,
         "harga": settings.HARGA_PER_JAM,
         "harga_teks": f"{settings.HARGA_PER_JAM:,}".replace(",", "."),
-        "hari_ini": timezone.localdate(),
+        "hari_ini": timezone.localdate().strftime("%d-%m-%Y"),
         "kontak_wa": f"https://wa.me/{settings.WHATSAPP_ADMIN}",
     }
     return render(request, "booking/buat_booking.html", konteks)
@@ -135,7 +135,7 @@ def booking_sukses(request, token):
 
 def slot_terisi(request):
     try:
-        tanggal = date.fromisoformat(request.GET.get("tanggal", ""))
+        tanggal = datetime.strptime(request.GET.get("tanggal", ""), "%d-%m-%Y").date()
     except ValueError:
         return JsonResponse({"terisi": []})
     terisi = Booking.objects.filter(tanggal=tanggal, status="confirmed").values_list("jam_mulai", flat=True)
