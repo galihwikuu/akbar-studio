@@ -41,7 +41,7 @@ h1, h2 {
   background-clip: text;
   color: transparent;
 }
-h1 { font-size: clamp(48px, 14vw, 96px); line-height: 0.95; }
+h1 { font-size: clamp(64px, 16vw, 96px); line-height: 1.05; }
 
 .header-img {
   width: 100%;
@@ -392,5 +392,5 @@ textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 10p
     rotate(calc(var(--d) * var(--tilt)));
 }
 
-.arc-up   { --lift: 6px;  --tilt: 4deg; }   /* AKBAR: melengkung ke atas */
-.arc-down { --lift: -6px; --tilt: -4deg; }  /* STUDIO: melengkung ke bawah */
+.arc-up   { --lift: 0.06em;  --tilt: 4deg;  margin-bottom: 0.2em; }
+.arc-down { --lift: -0.06em; --tilt: -4deg; margin-top: 0.2em; }
