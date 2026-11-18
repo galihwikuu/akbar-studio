@@ -1,3 +1,4 @@
+import logging
 from datetime import date, datetime, time, timedelta
 from collections import defaultdict
 from urllib.parse import quote, quote_plus
@@ -16,6 +17,8 @@ from django.views.decorators.http import require_POST
 from .forms import BookingForm, RatingForm
 from .models import TENTANG_DEFAULT, Booking, PengaturanSitus, Rating, FotoGaleri, buat_token
 from .services.email import kirim_notif_booking
+
+logger = logging.getLogger(__name__)
 
 def buat_booking(request):
     form = BookingForm(request.POST or None)
@@ -120,7 +123,14 @@ def konfirmasi_booking(request):
             messages.error(request, "Jam yang dipilih baru saja diambil orang lain. Coba jam lain.")
             return redirect("buat_booking")
         else:
-            kirim_notif_booking(daftar)
+            try:
+                kirim_notif_booking(daftar)
+            except Exception as exc:
+                logger.exception("Gagal mengirim email notifikasi booking: %s", exc)
+                messages.warning(
+                    request,
+                    "Booking berhasil dibuat, tapi notifikasi email gagal terkirim. Hubungi admin jika diperlukan.",
+                )
             del request.session["booking_data"]
             return redirect("booking_sukses", token=token)
 
@@ -147,7 +157,7 @@ def booking_sukses(request, token):
     rentang = f"{pertama.jam_mulai:02d}.00 - {daftar[-1].jam_mulai + 1:02d}.00"
     total = f"{sum(b.harga for b in daftar):,}".replace(",", ".")
     pesan = (
-        f"Halo admin, saya {pertama.nama} sudah booking studio.\n"
+        f"Halo Bapak, saya {pertama.nama} sudah booking studio.\n"
         f"Tanggal: {pertama.tanggal:%d-%m-%Y}\n"
         f"Jam: {rentang}\n"
         f"Total: Rp{total} (bayar di tempat)"
@@ -215,7 +225,7 @@ def batal_booking(request):
             if request.POST.get("konfirmasi") == "1":
                 Booking.objects.filter(token=token, status="confirmed").update(status="cancelled")
                 pesan = (
-                    f"Halo admin, saya {pertama.nama} membatalkan booking.\n"
+                    f"Halo Bapak, saya {pertama.nama} membatalkan booking.\n"
                     f"Tanggal: {pertama.tanggal:%d-%m-%Y}\n"
                     f"Jam: {rentang}"
                 )

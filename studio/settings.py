@@ -26,7 +26,8 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-dev-key-change-in-pro
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '').split(',') if os.environ.get('ALLOWED_HOSTS') else []
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '127.0.0.1,localhost,akbarstudiomusik.web.id').split(',')
+CSRF_TRUSTED_ORIGINS = ['https://akbarstudiomusik.web.id']
 
 
 # Application definition
@@ -118,7 +119,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 
 # Email
@@ -126,15 +128,31 @@ STATIC_URL = 'static/'
 
 MAILERS = {
     'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
+        'BACKEND': os.environ.get(
+            'EMAIL_BACKEND',
+            'django.core.mail.backends.console.EmailBackend' if DEBUG else 'django.core.mail.backends.smtp.EmailBackend',
+        ),
+        'OPTIONS': {
+            'host': os.environ.get('EMAIL_HOST', 'localhost'),
+            'port': int(os.environ.get('EMAIL_PORT', 25)),
+            'username': os.environ.get('EMAIL_HOST_USER', ''),
+            'password': os.environ.get('EMAIL_HOST_PASSWORD', ''),
+            'use_tls': os.environ.get('EMAIL_USE_TLS', 'False') == 'True',
+        },
     },
 }
 
-HARGA_PER_JAM = 30
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@example.com')
+EMAIL_ADMIN_LIST = [
+    e.strip() for e in os.environ.get('EMAIL_ADMIN', DEFAULT_FROM_EMAIL).split(',') if e.strip()
+]
+
+
+HARGA_PER_JAM = 30000
 JAM_BUKA = 7
 JAM_TUTUP = 22
 MAKS_DURASI = 3
-WHATSAPP_ADMIN = os.environ.get('WHATSAPP_ADMIN', '6285642362610')
+WHATSAPP_ADMIN = '628122609112'
 ALAMAT_STUDIO = os.environ.get('ALAMAT_STUDIO', '')
 
 MEDIA_URL = '/media/'

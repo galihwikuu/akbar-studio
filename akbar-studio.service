@@ -1,0 +1,15 @@
+[Unit]
+Description=Akbar Studio Django web
+After=network.target
+
+[Service]
+User=galihwikuu
+Group=galihwikuu
+WorkingDirectory=/home/galihwikuu/akbar-studio
+EnvironmentFile=/home/galihwikuu/akbar-studio/.env
+ExecStart=/home/galihwikuu/akbar-studio/.venv/bin/python manage.py runserver 127.0.0.1:8093
+Restart=unless-stopped
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
