@@ -15,6 +15,7 @@ from django.views.decorators.http import require_POST
 
 from .forms import BookingForm, RatingForm
 from .models import TENTANG_DEFAULT, Booking, PengaturanSitus, Rating, FotoGaleri, buat_token
+from .services.email import kirim_notif_booking
 
 def buat_booking(request):
     form = BookingForm(request.POST or None)
@@ -104,8 +105,9 @@ def konfirmasi_booking(request):
             token = buat_token()
         try:
             with transaction.atomic():
+                daftar = []
                 for jam in range(jam_mulai, jam_mulai + durasi):
-                    Booking.objects.create(
+                    b = Booking.objects.create(
                         nama=data["nama"],
                         whatsapp=data["whatsapp"],
                         tanggal=tanggal,
@@ -113,10 +115,12 @@ def konfirmasi_booking(request):
                         harga=settings.HARGA_PER_JAM,
                         token=token,
                     )
+                    daftar.append(b)
         except IntegrityError:
             messages.error(request, "Jam yang dipilih baru saja diambil orang lain. Coba jam lain.")
             return redirect("buat_booking")
         else:
+            kirim_notif_booking(daftar)
             del request.session["booking_data"]
             return redirect("booking_sukses", token=token)
 

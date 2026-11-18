@@ -1,4 +1,5 @@
 from datetime import timedelta
+from unittest import mock
 
 from django.test import TestCase
 from django.urls import reverse
@@ -107,3 +108,45 @@ class DashboardActiveBookingTest(TestCase):
         tokens = [b["token"] for b in response.context["active_bookings"]]
         self.assertEqual(tokens[0], self.token2)
         self.assertEqual(tokens[1], self.token1)
+
+
+class EmailNotifikasiTest(TestCase):
+    def setUp(self):
+        self.tanggal = timezone.localdate() + timedelta(days=1)
+        self.data = {
+            "nama": "Tester",
+            "whatsapp": "08123456789",
+            "tanggal": self.tanggal.strftime("%d-%m-%Y"),
+            "durasi": 1,
+            "jam_mulai": 10,
+        }
+
+    @mock.patch("booking.views.kirim_notif_booking")
+    def test_email_terkirim_saat_booking_berhasil(self, mock_kirim):
+        # Buat booking dulu untuk menyimpan data ke session
+        self.client.post(reverse("buat_booking"), self.data)
+        # Konfirmasi booking
+        response = self.client.post(reverse("konfirmasi_booking"))
+        self.assertEqual(response.status_code, 302)
+        mock_kirim.assert_called_once()
+
+        # Verify the email content contains required info
+        args = mock_kirim.call_args[0][0]
+        self.assertEqual(len(args), 1)
+        self.assertEqual(args[0].nama, "Tester")
+        self.assertEqual(args[0].whatsapp, "08123456789")
+
+    def test_email_tidak_terkirim_saat_booking_gagal(self):
+        # Buat booking dulu untuk menyimpan data ke session
+        self.client.post(reverse("buat_booking"), self.data)
+        # Buat booking lain yang bentrok slot
+        Booking.objects.create(
+            nama="Orang Lain",
+            whatsapp="08987654321",
+            tanggal=self.tanggal,
+            jam_mulai=10,
+            status="confirmed",
+            token="EXISTING1",
+        )
+        response = self.client.post(reverse("konfirmasi_booking"))
+        self.assertEqual(response.status_code, 302)
