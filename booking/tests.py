@@ -136,6 +136,30 @@ class EmailNotifikasiTest(TestCase):
         self.assertEqual(args[0].nama, "Tester")
         self.assertEqual(args[0].whatsapp, "08123456789")
 
+    @mock.patch("booking.views.kirim_notif_booking")
+    def test_email_error_masih_sukses(self, mock_kirim):
+        # Mock the email to raise an exception
+        mock_kirim.side_effect = Exception("SMTP connection failed")
+
+        # Buat booking dulu untuk menyimpan data ke session
+        self.client.post(reverse("buat_booking"), self.data)
+        # Konfirmasi booking - seharusnya tetap sukses meskipun email gagal
+        response = self.client.post(reverse("konfirmasi_booking"))
+        self.assertEqual(response.status_code, 302)
+
+        # Booking tetap tercatat walau email gagal
+        booking = Booking.objects.get(nama="Tester")
+        self.assertRedirects(
+            response, reverse("booking_sukses", args=[booking.token])
+        )
+
+        # Pesan peringatan muncul
+        msgs = list(response.wsgi_request._messages)
+        self.assertTrue(
+            any("notifikasi email gagal" in str(m).lower() for m in msgs),
+            f"Pesan peringatan tidak ditemukan: {[str(m) for m in msgs]}",
+        )
+
     def test_email_tidak_terkirim_saat_booking_gagal(self):
         # Buat booking dulu untuk menyimpan data ke session
         self.client.post(reverse("buat_booking"), self.data)
