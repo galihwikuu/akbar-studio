@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.db.models import OuterRef, Subquery, Count, Sum, Min
 from django.utils.html import format_html
 
 from .models import PengaturanSitus, Booking, Rating, FotoGaleri
@@ -10,7 +11,7 @@ admin.site.index_title = "Dashboard"
 
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
-    list_display = ["nama", "wa_link", "tanggal", "jam_mulai", "status_badge", "harga_rp", "created_at"]
+    list_display = ["nama", "tanggal", "jam_range", "durasi", "total_harga", "wa_link", "status_badge", "token"]
     list_filter = ["status", "tanggal"]
     search_fields = ["nama", "whatsapp", "token"]
     date_hierarchy = "tanggal"
@@ -18,6 +19,44 @@ class BookingAdmin(admin.ModelAdmin):
     ordering = ["-tanggal", "jam_mulai"]
     list_per_page = 25
     actions = ["batalkan_booking"]
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+
+        first_ids = (
+            qs.values("token")
+            .annotate(first_id=Min("id"))
+            .values_list("first_id", flat=True)
+        )
+        qs = qs.filter(id__in=first_ids)
+
+        token_rows = Booking.objects.filter(token=OuterRef("token"))
+        qs = qs.annotate(
+            durasi=Subquery(
+                token_rows.values("token").annotate(c=Count("id")).values("c")[:1]
+            ),
+            total_harga=Subquery(
+                token_rows.values("token").annotate(s=Sum("harga")).values("s")[:1]
+            ),
+            jam_mulai_awal=Subquery(
+                token_rows.order_by("jam_mulai").values("jam_mulai")[:1]
+            ),
+        )
+        return qs
+
+    @admin.display(description="Durasi", ordering="durasi")
+    def durasi(self, obj):
+        return f"{obj.durasi} jam"
+
+    @admin.display(description="Jam", ordering="jam_mulai_awal")
+    def jam_range(self, obj):
+        mulai = obj.jam_mulai_awal
+        selesai = mulai + obj.durasi
+        return f"{mulai:02d}.00 - {selesai:02d}.00"
+
+    @admin.display(description="Total", ordering="total_harga")
+    def total_harga(self, obj):
+        return "Rp" + f"{int(obj.total_harga):,}".replace(",", ".")
 
     @admin.display(description="Status", ordering="status")
     def status_badge(self, obj):
@@ -27,10 +66,6 @@ class BookingAdmin(admin.ModelAdmin):
             'font-size:11px;letter-spacing:.08em;text-transform:uppercase">{}</span>',
             warna, obj.status,
         )
-
-    @admin.display(description="Harga", ordering="harga")
-    def harga_rp(self, obj):
-        return "Rp" + f"{int(obj.harga):,}".replace(",", ".")
 
     @admin.display(description="WhatsApp")
     def wa_link(self, obj):
