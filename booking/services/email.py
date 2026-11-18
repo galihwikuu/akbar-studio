@@ -29,7 +29,7 @@ def kirim_notif_booking(daftar_booking):
 
     subject = f"Notifikasi Booking Baru - {pertama.nama} ({pertama.tanggal:%d-%m-%Y})"
     from_email = settings.DEFAULT_FROM_EMAIL
-    recipient_list = [settings.EMAIL_ADMIN]
+    recipient_list = settings.EMAIL_ADMIN_LIST
 
     text_content = (
         f"Booking baru masuk:\n"

@@ -18,7 +18,7 @@ class BookingAdmin(admin.ModelAdmin):
     readonly_fields = ["token", "created_at"]
     ordering = ["-tanggal", "jam_mulai"]
     list_per_page = 25
-    actions = ["batalkan_booking"]
+    actions = ["batalkan_booking", "hapus_grup_token"]
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
@@ -43,6 +43,12 @@ class BookingAdmin(admin.ModelAdmin):
             ),
         )
         return qs
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if "delete_selected" in actions:
+            del actions["delete_selected"]
+        return actions
 
     @admin.display(description="Durasi", ordering="durasi")
     def durasi(self, obj):
@@ -81,6 +87,19 @@ class BookingAdmin(admin.ModelAdmin):
     def batalkan_booking(self, request, queryset):
         updated = queryset.filter(status="confirmed").update(status="cancelled")
         self.message_user(request, f"{updated} booking dibatalkan.")
+
+    @admin.action(description="Hapus semua slot dengan token yang sama")
+    def hapus_grup_token(self, request, queryset):
+        tokens = set(queryset.values_list("token", flat=True))
+        jumlah_dihapus = 0
+        for token in tokens:
+            count = Booking.objects.filter(token=token).count()
+            Booking.objects.filter(token=token).delete()
+            jumlah_dihapus += count
+        self.message_user(
+            request,
+            f"{jumlah_dihapus} slot booking ({len(tokens)} grup token) dihapus.",
+        )
 
 
 @admin.register(Rating)
