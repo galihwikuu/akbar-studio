@@ -64,6 +64,44 @@ class BookingAdmin(admin.ModelAdmin):
     def total_harga(self, obj):
         return "Rp" + f"{int(obj.total_harga):,}".replace(",", ".")
 
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+
+        first_ids = (
+            qs.values("token")
+            .annotate(first_id=Min("id"))
+            .values_list("first_id", flat=True)
+        )
+        qs = qs.filter(id__in=first_ids)
+
+        token_rows = Booking.objects.filter(token=OuterRef("token"))
+        qs = qs.annotate(
+            durasi=Subquery(
+                token_rows.values("token").annotate(c=Count("id")).values("c")[:1]
+            ),
+            total_harga=Subquery(
+                token_rows.values("token").annotate(s=Sum("harga")).values("s")[:1]
+            ),
+            jam_mulai_awal=Subquery(
+                token_rows.order_by("jam_mulai").values("jam_mulai")[:1]
+            ),
+        )
+        return qs
+
+    @admin.display(description="Durasi", ordering="durasi")
+    def durasi(self, obj):
+        return f"{obj.durasi} jam"
+
+    @admin.display(description="Jam", ordering="jam_mulai_awal")
+    def jam_range(self, obj):
+        mulai = obj.jam_mulai_awal
+        selesai = mulai + obj.durasi
+        return f"{mulai:02d}.00 - {selesai:02d}.00"
+
+    @admin.display(description="Total", ordering="total_harga")
+    def total_harga(self, obj):
+        return "Rp" + f"{int(obj.total_harga):,}".replace(",", ".")
+
     @admin.display(description="Status", ordering="status")
     def status_badge(self, obj):
         warna = {"confirmed": "#1f9d55", "cancelled": "#d7141f"}.get(obj.status, "#6b6e75")
